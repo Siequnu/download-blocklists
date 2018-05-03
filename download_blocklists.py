@@ -22,71 +22,71 @@ BLOCKLIST_URLS = [("level1", "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybc
 
 
 # Prints a new line for prettifying console
-def printNewLine ():
+def print_new_line ():
 	print ""
 
 
 # Receives text to be printed to log, temporarily changes stdout to log text.
 # Logs text, then reverts stdout back to terminal, and returns the original
 # text as a string to be printed on screen if wanted
-def log(logText):
+def log(log_text):
 	backup = sys.stdout
 	sys.stdout = open('/var/log/download_blocklists.log', 'a') # Set all print to go to log file
-	print (str(logText))
+	print (str(log_text))
 	sys.stdout = backup # Revert back to original output in terminal
-	return str(logText)
+	return str(log_text)
 
 
 # Main entrance into the program
-def main (blocklistTargetFolder = "/var/lib/transmission-daemon/.config/transmission-daemon/blocklists/"):
+def main (blocklist_target_folder = "/var/lib/transmission-daemon/.config/transmission-daemon/blocklists/"):
 	global BLOCKLIST_URLS
 	
 	print (log (datetime.now().strftime('Starting new download script at %H:%M on %d/%m/%Y')))
 	
 	print "Downloading the following " + str(len(BLOCKLIST_URLS)) + " lists:"
-	indexNumber = 1
+	index_number = 1
 	for url in BLOCKLIST_URLS:
-		prettyName, blocklistUrl = url[0], url[1]
-		print str(indexNumber) + ": " + prettyName + ": " + blocklistUrl
-		indexNumber = indexNumber + 1
-	printNewLine()
-	print "Blocklist files will be extracted to: " + blocklistTargetFolder
-	printNewLine()
+		pretty_name, blocklist_url = url[0], url[1]
+		print str(index_number) + ": " + pretty_name + ": " + blocklist_url
+		index_number = index_number + 1
+	print_new_line()
+	print "Blocklist files will be extracted to: " + blocklist_target_folder
+	print_new_line()
 	
 	# Stop the transmission daemon - this will be restarted as the last step of this script
 	print "Stopping transmission daemon..."
 	subprocess.call("sudo service transmission-daemon stop",shell=True)
 	print "Transmission daemon stopped."
-	printNewLine()
+	print_new_line()
 	
 	print "Starting download..."
 	for url in BLOCKLIST_URLS:
-		prettyName, blocklistUrl = url[0], url[1]
-		print "Downloading " + prettyName + " blocklist..."
-		response = urllib2.urlopen(blocklistUrl)
+		pretty_name, blocklist_url = url[0], url[1]
+		print "Downloading " + pretty_name + " blocklist..."
+		response = urllib2.urlopen(blocklist_url)
 		zipcontent = response.read()
 		
-		with open("/tmp/" + prettyName + "-blocklist", 'w') as f:
+		with open("/tmp/" + pretty_name + "-blocklist", 'w') as f:
 			f.write(zipcontent)
 	
 		print "Download successful. Attempting to extract file..."
 	
-		inF = gzip.open("/tmp/" + prettyName + "-blocklist", 'rb')
-		outFilename = blocklistTargetFolder + prettyName + "unpacked" + ".txt"
+		inF = gzip.open("/tmp/" + pretty_name + "-blocklist", 'rb')
+		outFilename = blocklist_target_folder + pretty_name + "unpacked" + ".txt"
 		outF = open(outFilename, 'wb')
 		outF.write( inF.read() )
 		inF.close()
 		outF.close()
 		
-		print "Successfully extracted " + prettyName + " blocklist."
+		print "Successfully extracted " + pretty_name + " blocklist."
 	
-	printNewLine()
+	print_new_line()
 	print "Successfully downloaded and extracted all blocklists."
-	printNewLine()
+	print_new_line()
 	print "Restarting transmission daemon..."
 	subprocess.call("sudo service transmission-daemon start", shell=True)
 	print "Transmission daemon restarted."
-	printNewLine()
+	print_new_line()
 	
 	# Log that the script ran successfully
 	print (log(datetime.now().strftime('Blocklist download script finished successfully at %H:%M on %d/%m/%Y')))
@@ -99,8 +99,8 @@ print ('Starting Blocklist Downloader...')
 
 # Assign arguments
 if '<blocklist-target-folder>' in arguments:
-	blocklistTargetFolder = str(arguments['<blocklist-target-folder>'])
-	print ('Setting target folder as ' + blocklistTargetFolder)
-	main (blocklistTargetFolder)
+	blocklist_target_folder = str(arguments['<blocklist-target-folder>'])
+	print ('Setting target folder as ' + blocklist_target_folder)
+	main (blocklist_target_folder)
 else:
 	main ()
