@@ -1,12 +1,13 @@
 """Blocklist Downloader.
 
 Usage:
-  download_blocklists.py [<blocklist-target-folder>]
+  download_blocklists.py [--f blocklist-target-folder]
   download_blocklists.py (-h | --help)
   download_blocklists.py --version
 
 Options:
   -h --help     Show this screen.
+  --f           Specify a blocklist target folder
   --version     Show version.
 
 """
